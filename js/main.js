@@ -46,7 +46,8 @@ function getExcludedCorners(buffer) {
 function updateVisualCube() {
     let scr = document.getElementById("scramble").innerHTML;
 
-    vcCube.identity(); // reset cube
+    vcCube.identity(); // reset cube 
+    console.log(vc.cubeString);
     vcCube.move(scr);
     vc.cubeString = vcCube.asString();
     vc.drawCube(ctx);
@@ -87,6 +88,7 @@ document.addEventListener('keydown', event => {
 
 document.getElementById("last").onclick = function () {
     lastScram();
+    updateVisualCube()
 };
 
 // Selecting new buffer(s)
