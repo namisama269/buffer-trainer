@@ -13,6 +13,11 @@ let nextscram = bt.getScram();
 let thisscram = "";
 let lastscram = "";
 
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+let vc = new VisualCube(1200, 1200, 400, -0.523598, -0.209439, 0, 3, 0.08);
+let vcCube = new Cube();
+
 function newBufferTrainer() {
     EXCLUDEDEDGES = getExcludedEdges(EDGEBUFFER);
     EXCLUDEDCORNERS = getExcludedCorners(CORNERBUFFER);
@@ -37,6 +42,18 @@ function getExcludedCorners(buffer) {
     return CORNERBUFFERORDER.slice(0, bufferIndex);
 }
 
+// Update visual cube
+function updateVisualCube() {
+    let scr = document.getElementById("scramble").innerHTML;
+
+    vcCube.identity(); // reset cube
+    vcCube.move(scr);
+    vc.cubeString = vcCube.asString();
+    vc.drawCube(ctx);
+
+    console.log(scr);
+}
+
 // Scramble generation. 
 function genScram() {
     thisscram = nextscram;
@@ -47,6 +64,7 @@ function displayScram() {
     lastscram = thisscram;
     document.getElementById("scramble").innerHTML = nextscram;
     genScram();
+    updateVisualCube()
 }
 
 function lastScram() {
