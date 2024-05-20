@@ -157,3 +157,7 @@ ul.edgebufferlist li, ul.cornerbufferlist li {
     color: #e5c07b;
     cursor: pointer;
 }
+
+canvas {
+    width: 400px;
+}

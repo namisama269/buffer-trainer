@@ -3,6 +3,10 @@ Cube.initSolver();
 const EDGES = ["UF", "UB", "UR", "UL", "DF", "DB", "FR", "FL", "DR", "DL", "BR", "BL"]
 const CORNERS = ["UFR", "UFL", "UBL", "UBR", "DFR", "DFL", "DBR", "DBL"]
 
+const canvas = document.getElementById('myCanvas');
+const ctx = canvas.getContext('2d');
+let vc = new VisualCube(1200, 1200, 400, -0.523598, -0.209439, 0, 3, 0.08);
+
 function randIndex(list) {
     let index = Math.floor(Math.random()*list.length);
     return index;
@@ -135,6 +139,12 @@ class bufferTrainer {
         const cube = new Cube();
         let setup = algs.join(" ");
         cube.move(setup);
-        return cube.solve();
+        
+        let scr = cube.solve();
+        vc.cubeString = cube.asString();
+        vc.drawCube(ctx);
+
+        console.log(scr);
+        return scr;
     }
 }
