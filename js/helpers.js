@@ -176,27 +176,116 @@ function distToCam(points, width) {
     return Math.sqrt(dx * dx + dy * dy + dz * dz);
 }  
 
-function reverseRubiksMoves(moves) {
-    // Split the input string into an array of moves
+function invertMoves(moves) {
+    if (moves == "") {
+        return moves;
+    }
+
+    moves = moves.trim();
+    moves = moves.replace(/\s+/g, " ");
+
     let moveArray = moves.split(' ');
     
-    // Reverse the order of moves
     moveArray.reverse();
     
-    // Function to reverse a single move
     function reverseMove(move) {
         if (move.includes('2')) {
-            return move; // '2' moves remain the same
+            return move;
         } else if (move.includes("'")) {
-            return move.replace("'", ""); // Remove the prime
+            return move.replace("'", "");
         } else {
-            return move + "'"; // Add the prime
+            return move + "'";
         }
     }
 
-    // Apply the reverseMove function to each move
     let reversedMoves = moveArray.map(reverseMove);
 
-    // Join the reversed moves back into a string
     return reversedMoves.join(' ');
+}
+
+// supports normal comm notation and Elliott notation
+// simple function to convert commutator notation to moves before passing to alg parser
+
+function isCommutator(alg) {
+    return alg.includes("/") || alg.includes(",") || alg.includes(":");
+}
+
+function getRepeatedAlg(alg) {
+    let pattern = /\(([a-zA-Z]+)\)(\d+)/;
+    let match = input.match(alg);
+
+    if (!match) {
+        return alg;
+    }
+
+    const part = match[1];
+    const times = parseInt(match[2], 10);
+
+    return ((part + " ").repeat(times)).trim();
+}
+
+function commToMoves(alg) {
+    if (!isCommutator(alg) && !alg.includes("+")) {
+        return alg;
+    }
+
+    let out = "";
+
+    // remove unnnecessary brackets
+    alg = alg.replace(/[\[\]{}()]/g, "");
+
+    // split comms joined by +
+    comms = alg.includes("+") ? alg.split("+") : [alg];
+
+    // process each comm
+    comms.forEach(comm => {
+        if (!isCommutator(comm)) {
+            console.log(comm);
+            out += " " + comm;
+        }
+        else {
+            comm = comm.trim();
+            comm = comm.replace(/\s+/g, " ");
+            // console.log(comm);
+            // get the setup move if exists
+            let setup = "";
+            if (comm.includes(":")) {
+                let parts = comm.split(":");
+                setup = parts[0];
+                comm = parts[1];
+            }
+
+            // split on , or /
+            let a = "", b = "";
+            let mainComm = "";
+
+            if (comm.includes(",")) {
+                let parts = comm.split(",");
+                a = parts[0], b = parts[1];
+                mainComm = a + " " + b + " " + invertMoves(a) + " " + invertMoves(b);
+            }
+            else if (comm.includes("/")) {
+                let parts = comm.split("/");
+                a = parts[0], b = parts[1];
+                mainComm = a + " " + b + " " + a + "2 " + invertMoves(b) + " " + a;
+                mainComm = mainComm.replace(/'2/g, "2");
+            }
+            else {
+                mainComm = comm;
+            }
+
+            // console.log(mainComm);
+
+            let moves = setup + " " + mainComm + " " + invertMoves(setup);
+
+            moves = moves.trim();
+            moves = moves.replace(/\s+/g, " ");
+
+            out += " " + moves;
+        }
+    });
+
+    out = out.trim();
+    out = out.replace(/\s+/g, " ");
+    return out;
 }
